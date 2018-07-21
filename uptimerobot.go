@@ -37,18 +37,18 @@ type Monitor struct {
 	Friendly_name   string  `json:"friendly_name"`
 	Url             string  `json:"url"`
 	Monitor_type    int     `json:"type"`
-	Sub_type        *string `json:"sub_type"`
-	Keyword_type    *string `json:"keyword_type"`
-	Keyword_value   *string `json:"keyword_value"`
-	Http_username   *string `json:"http_username"`
-	Http_password   *string `json:"http_password"`
-	Port            *string `json:"http_port"`
-	Interval        *int    `json:"interval"`
-	Status          *int    `json:"status"`
-	Create_datetime *int    `json:"create_datetime"`
-	Monitor_group   *int    `json:"monitor_group"`
-	Is_group_main   *int    `json:"is_group_main"`
-	Logs            []Log   `json:"logs"`
+	Sub_type        *string `json:"sub_type,omitempty"`
+	Keyword_type    *string `json:"keyword_type,omitempty"`
+	Keyword_value   *string `json:"keyword_value,omitempty"`
+	Http_username   *string `json:"http_username,omitempty"`
+	Http_password   *string `json:"http_password,omitempty"`
+	Port            *string `json:"http_port,omitempty"`
+	Interval        *int    `json:"interval,omitempty"`
+	Status          *int    `json:"status,omitempty"`
+	Create_datetime *int    `json:"create_datetime,omitempty"`
+	Monitor_group   *int    `json:"monitor_group,omitempty"`
+	Is_group_main   *int    `json:"is_group_main,omitempty"`
+	Logs            []Log   `json:"logs,omitempty"`
 }
 
 type Pagination struct {
