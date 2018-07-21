@@ -26,6 +26,14 @@ const MONITOR_TYPE_KEYWORD = 2
 const MONITOR_TYPE_PING = 3
 const MONITOR_TYPE_PORT = 4
 
+const MONITOR_SUB_TYPE_HTTP = 1
+const MONITOR_SUB_TYPE_HTTPS = 2
+const MONITOR_SUB_TYPE_FTP = 3
+const MONITOR_SUB_TYPE_SMTP = 4
+const MONITOR_SUB_TYPE_POP3 = 5
+const MONITOR_SUB_TYPE_IMAP = 6
+const MONITOR_SUB_TYPE_CUSTOM = 99
+
 const MONITOR_STATUS_PAUSED = 0
 const MONITOR_STATUS_NOT_CHECKED = 1
 const MONITOR_STATUS_UP = 2
@@ -111,26 +119,27 @@ func (c *Client) getMonitors() ([]Monitor, error) {
 	return monitors_resp.Monitors, err
 }
 
-func (c *Client) createMonitor(friendly_name string, monitor_url string, monitor_type int) (int, error) {
+func (c *Client) createMonitor(m *Monitor) error {
 	data := url.Values{}
 	req, err := c._makeReq("/newMonitor", &data)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	data.Set("friendly_name", friendly_name)
-	data.Set("url", monitor_url)
-	data.Set("type", fmt.Sprintf("%d", monitor_type))
+	data.Set("friendly_name", m.Friendly_name)
+	data.Set("url", m.Url)
+	data.Set("type", fmt.Sprintf("%d", m.Monitor_type))
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	defer resp.Body.Close()
 
 	var monitor_create_resp CreateMonitorResp
 	err = json.NewDecoder(resp.Body).Decode(&monitor_create_resp)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return monitor_create_resp.Monitor.Id, nil
+	m.Id = monitor_create_resp.Monitor.Id
+	return nil
 }

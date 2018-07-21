@@ -77,7 +77,12 @@ func TestCreateMonitor(t *testing.T) {
 		httpClient: ts.Client(),
 		api_key:    "abcdefg",
 	}
-	new_id, err := c.createMonitor("make_friendly", "http://make.test", MONITOR_TYPE_HTTP)
+	m := Monitor{
+		Friendly_name: "make_friendly",
+		Url:           "http://make.test",
+		Monitor_type:  MONITOR_TYPE_HTTP,
+	}
+	err = c.createMonitor(&m)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 99, new_id)
+	assert.Equal(t, 99, m.Id)
 }
