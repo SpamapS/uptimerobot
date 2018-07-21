@@ -12,18 +12,29 @@ import (
 func _makeTestServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         e := json.NewEncoder(w)
-        cmon := CreateMonitorResp {
-            stat: "ok",
-            monitor: CreatedMonitor {
-                id: "0",
-                status: 0,
+        var mons = []Monitor {
+            Monitor {
+                Id: "0",
+                Friendly_name: "foo",
+                Url: "http://nothing.test",
+                Monitor_type: 1,
             },
         }
-        e.Encode(cmon)
+        p := Pagination {
+            Offset: 0,
+            Limit: 1,
+            Total: 1,
+        }
+        mr := MonitorResp {
+            Stat: "ok",
+            Pagination: p,
+            Monitors: mons,
+        }
+        e.Encode(mr)
 	}))
 }
 
-func TestMakeMonitor(t *testing.T) {
+func TestGetMonitors(t *testing.T) {
 	ts := _makeTestServer()
 	defer ts.Close()
 
@@ -38,5 +49,6 @@ func TestMakeMonitor(t *testing.T) {
 	}
     m, err := c.getMonitors()
     assert.Equal(t, nil, err)
-    assert.Equal(t, "ok", m.stat)
+    assert.Equal(t, 1, len(m))
+    assert.Equal(t, "0", (m[0].Id))
 }

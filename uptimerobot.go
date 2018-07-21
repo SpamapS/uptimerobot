@@ -15,50 +15,50 @@ type Client struct {
 }
 
 type Log struct {
-	log_type int
-	datetime int
-	duration int
+	Log_type int `json:"type"`
+	Datetime int `json:"datetime"`
+	Duration int `json:"duration"`
 }
 
 type Monitor struct {
-	id              string
-	friendly_name   string
-	url             string
-	monitor_type    int
-	sub_type        *string
-	keyword_type    *string
-	keyword_value   *string
-	http_username   *string
-	http_password   *string
-	port            *string
-	interval        *int
-	status          *int
-	create_datetime *int
-	monitor_group   *int
-	is_group_main   *int
-	logs            []Log
+	Id              string  `json:"id"`
+	Friendly_name   string  `json:"friendly_name"`
+	Url             string  `json:"url"`
+	Monitor_type    int     `json:"type"`
+	Sub_type        *string `json:"sub_type"`
+	Keyword_type    *string `json:"keyword_type"`
+	Keyword_value   *string `json:"keyword_value"`
+	Http_username   *string `json:"http_username"`
+	Http_password   *string `json:"http_password"`
+	Port            *string `json:"http_port"`
+	Interval        *int    `json:"interval"`
+	Status          *int    `json:"status"`
+	Create_datetime *int    `json:"create_datetime"`
+	Monitor_group   *int    `json:"monitor_group"`
+	Is_group_main   *int    `json:"is_group_main"`
+	Logs            []Log   `json:"logs"`
 }
 
 type Pagination struct {
-	offset int
-	limit  int
-	total  int
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
+	Total  int `json:"total"`
 }
 
 type MonitorResp struct {
-	stat       string
-	pagination Pagination
-	monitors   []Monitor
+	Stat       string     `json:"stat"`
+	Pagination Pagination `json:"pagination"`
+	Monitors   []Monitor  `json:"monitors"`
 }
 
 type CreatedMonitor struct {
-	id     string
-	status int
+	Id     string `json:"id"`
+	Status int    `json:"status"`
 }
 
 type CreateMonitorResp struct {
-	stat    string
-	monitor CreatedMonitor
+	Stat    string         `json:"stat"`
+	Monitor CreatedMonitor `json:"monitor"`
 }
 
 func (c *Client) _makeReq(path string, data *url.Values) (*http.Request, error) {
@@ -89,12 +89,14 @@ func (c *Client) getMonitors() ([]Monitor, error) {
 	}
 	defer resp.Body.Close()
 
+    //bodybuffer, _ := ioutil.ReadAll(resp.Body)
+    //fmt.Printf("%s", bodybuffer)
 	var monitors_resp MonitorResp
 	err = json.NewDecoder(resp.Body).Decode(&monitors_resp)
 	if err != nil {
 		return nil, err
 	}
-	return monitors_resp.monitors, err
+	return monitors_resp.Monitors, err
 }
 
 func (c *Client) createMonitor(friendly_name string, monitor_url string, monitor_type string) (string, error) {
@@ -118,5 +120,5 @@ func (c *Client) createMonitor(friendly_name string, monitor_url string, monitor
 	if err != nil {
 		return "", err
 	}
-	return monitor_create_resp.monitor.id, nil
+	return monitor_create_resp.Monitor.Id, nil
 }
