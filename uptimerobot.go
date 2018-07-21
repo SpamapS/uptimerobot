@@ -1,4 +1,4 @@
-package main
+package uptimerobot
 
 import (
 	"encoding/json"
@@ -25,17 +25,17 @@ type Monitor struct {
 	friendly_name   string
 	url             string
 	monitor_type    int
-	sub_type        string
-	keyword_type    string
-	keyword_value   string
-	http_username   string
-	http_password   string
-	port            string
-	interval        int
-	status          int
-	create_datetime int
-	monitor_group   int
-	is_group_main   int
+	sub_type        *string
+	keyword_type    *string
+	keyword_value   *string
+	http_username   *string
+	http_password   *string
+	port            *string
+	interval        *int
+	status          *int
+	create_datetime *int
+	monitor_group   *int
+	is_group_main   *int
 	logs            []Log
 }
 
