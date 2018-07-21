@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+    "fmt"
 )
 
 type Client struct {
@@ -20,8 +21,19 @@ type Log struct {
 	Duration int `json:"duration"`
 }
 
+const MONITOR_TYPE_HTTP    = 1
+const MONITOR_TYPE_KEYWORD = 2
+const MONITOR_TYPE_PING    = 3
+const MONITOR_TYPE_PORT    = 4
+
+const MONITOR_STATUS_PAUSED      = 0
+const MONITOR_STATUS_NOT_CHECKED = 1
+const MONITOR_STATUS_UP          = 2
+const MONITOR_STATUS_SEEMS_DOWN  = 3
+const MONITOR_STATUS_DOWN        = 4
+
 type Monitor struct {
-	Id              string  `json:"id"`
+	Id              int     `json:"id"`
 	Friendly_name   string  `json:"friendly_name"`
 	Url             string  `json:"url"`
 	Monitor_type    int     `json:"type"`
@@ -52,8 +64,8 @@ type MonitorResp struct {
 }
 
 type CreatedMonitor struct {
-	Id     string `json:"id"`
-	Status int    `json:"status"`
+	Id     int `json:"id"`
+	Status int `json:"status"`
 }
 
 type CreateMonitorResp struct {
@@ -99,26 +111,26 @@ func (c *Client) getMonitors() ([]Monitor, error) {
 	return monitors_resp.Monitors, err
 }
 
-func (c *Client) createMonitor(friendly_name string, monitor_url string, monitor_type string) (string, error) {
+func (c *Client) createMonitor(friendly_name string, monitor_url string, monitor_type int) (int, error) {
 	data := url.Values{}
 	req, err := c._makeReq("/newMonitor", &data)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	data.Set("friendly_name", friendly_name)
 	data.Set("url", monitor_url)
-	data.Set("type", monitor_type)
+	data.Set("type", fmt.Sprintf("%d", monitor_type))
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	defer resp.Body.Close()
 
 	var monitor_create_resp CreateMonitorResp
 	err = json.NewDecoder(resp.Body).Decode(&monitor_create_resp)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	return monitor_create_resp.Monitor.Id, nil
 }
