@@ -2,10 +2,10 @@ package uptimerobot
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
-    "fmt"
 )
 
 type Client struct {
@@ -21,16 +21,16 @@ type Log struct {
 	Duration int `json:"duration"`
 }
 
-const MONITOR_TYPE_HTTP    = 1
+const MONITOR_TYPE_HTTP = 1
 const MONITOR_TYPE_KEYWORD = 2
-const MONITOR_TYPE_PING    = 3
-const MONITOR_TYPE_PORT    = 4
+const MONITOR_TYPE_PING = 3
+const MONITOR_TYPE_PORT = 4
 
-const MONITOR_STATUS_PAUSED      = 0
+const MONITOR_STATUS_PAUSED = 0
 const MONITOR_STATUS_NOT_CHECKED = 1
-const MONITOR_STATUS_UP          = 2
-const MONITOR_STATUS_SEEMS_DOWN  = 3
-const MONITOR_STATUS_DOWN        = 4
+const MONITOR_STATUS_UP = 2
+const MONITOR_STATUS_SEEMS_DOWN = 3
+const MONITOR_STATUS_DOWN = 4
 
 type Monitor struct {
 	Id              int     `json:"id"`
@@ -101,8 +101,8 @@ func (c *Client) getMonitors() ([]Monitor, error) {
 	}
 	defer resp.Body.Close()
 
-    //bodybuffer, _ := ioutil.ReadAll(resp.Body)
-    //fmt.Printf("%s", bodybuffer)
+	//bodybuffer, _ := ioutil.ReadAll(resp.Body)
+	//fmt.Printf("%s", bodybuffer)
 	var monitors_resp MonitorResp
 	err = json.NewDecoder(resp.Body).Decode(&monitors_resp)
 	if err != nil {
