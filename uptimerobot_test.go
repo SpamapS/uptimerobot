@@ -70,6 +70,16 @@ func makeTestServer() *httptest.Server {
 				},
 			}
 			e.Encode(edited)
+		} else if r.Method == "POST" && r.URL.Path == "/deleteMonitor" {
+			var deleted = ChangeMonitorResp{
+				Stat: "ok",
+				Monitor: ChangedMonitor{
+					Id: 99,
+				},
+			}
+			e.Encode(deleted)
+		} else {
+			http.NotFound(w, r)
 		}
 	}))
 }
@@ -136,5 +146,22 @@ func TestEditMonitor(t *testing.T) {
 		Monitor_type:  MONITOR_TYPE_HTTP,
 	}
 	err = c.EditMonitor(&m)
+	assert.Equal(t, nil, err)
+}
+
+func TestDeleteMonitor(t *testing.T) {
+	ts := makeTestServer()
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	assert.Equal(t, nil, err)
+
+	c := Client{
+		BaseURL:    u,
+		UserAgent:  "Bah",
+		HttpClient: ts.Client(),
+		Api_key:    "abcdefg",
+	}
+	err = c.DeleteMonitor(99)
 	assert.Equal(t, nil, err)
 }

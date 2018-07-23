@@ -174,15 +174,25 @@ func (c *Client) EditMonitor(m *Monitor) error {
 		return err
 	}
 	_, err = c.changeMonitor(req, &data, m)
+	return err
+}
+
+func (c *Client) DeleteMonitor(id int) error {
+	data := url.Values{}
+	req, err := c.makeReq("/deleteMonitor", &data)
 	if err != nil {
 		return err
 	}
-	return nil
+	data.Set("id", fmt.Sprintf("%d", id))
+	_, err = c.changeMonitor(req, &data, nil)
+	return err
 }
 
 func (c *Client) changeMonitor(req *http.Request, data *url.Values, m *Monitor) (ChangeMonitorResp, error) {
 	var monitor_change_resp ChangeMonitorResp
-	c.setCommonData(data, m)
+	if m != nil {
+		c.setCommonData(data, m)
+	}
 
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
