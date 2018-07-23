@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func _makeTestServer() *httptest.Server {
+func makeTestServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		e := json.NewEncoder(w)
 		if r.Method == "POST" && r.URL.Path == "/getMonitors" {
@@ -75,7 +75,7 @@ func _makeTestServer() *httptest.Server {
 }
 
 func TestGetMonitors(t *testing.T) {
-	ts := _makeTestServer()
+	ts := makeTestServer()
 	defer ts.Close()
 
 	u, err := url.Parse(ts.URL)
@@ -94,7 +94,7 @@ func TestGetMonitors(t *testing.T) {
 }
 
 func TestCreateMonitor(t *testing.T) {
-	ts := _makeTestServer()
+	ts := makeTestServer()
 	defer ts.Close()
 
 	u, err := url.Parse(ts.URL)
