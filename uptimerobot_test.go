@@ -13,38 +13,38 @@ func _makeTestServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		e := json.NewEncoder(w)
 		if r.Method == "POST" && r.URL.Path == "/getMonitors" {
-            mv := r.FormValue("monitors")
-            var mons []Monitor
-            mon_99 := Monitor{
-					Id:            99,
-					Friendly_name: "foo",
-					Url:           "http://nothing.test",
-					Monitor_type:  1,
+			mv := r.FormValue("monitors")
+			var mons []Monitor
+			mon_99 := Monitor{
+				Id:            99,
+				Friendly_name: "foo",
+				Url:           "http://nothing.test",
+				Monitor_type:  1,
 			}
-            mon_100 := Monitor{
-					Id:            100,
-					Friendly_name: "bar",
-					Url:           "http://nobar.test",
-					Monitor_type:  1,
+			mon_100 := Monitor{
+				Id:            100,
+				Friendly_name: "bar",
+				Url:           "http://nobar.test",
+				Monitor_type:  1,
 			}
-            if mv == "" || mv == "99-100" || mv == "100-99" {
-                mons = []Monitor{
-                    mon_99,
-                    mon_100,
-                }
-            } else if mv == "99" {
-                mons = []Monitor{
-                    mon_99,
-                }
-            } else if mv == "100" {
-                mons = []Monitor{
-                    mon_100,
-                }
-            }
+			if mv == "" || mv == "99-100" || mv == "100-99" {
+				mons = []Monitor{
+					mon_99,
+					mon_100,
+				}
+			} else if mv == "99" {
+				mons = []Monitor{
+					mon_99,
+				}
+			} else if mv == "100" {
+				mons = []Monitor{
+					mon_100,
+				}
+			}
 			p := Pagination{
 				Offset: 0,
-				Limit:  1,
-				Total:  1,
+				Limit:  2,
+				Total:  len(mons),
 			}
 			mr := MonitorResp{
 				Stat:       "ok",
@@ -53,14 +53,23 @@ func _makeTestServer() *httptest.Server {
 			}
 			e.Encode(mr)
 		} else if r.Method == "POST" && r.URL.Path == "/newMonitor" {
-			var created = CreateMonitorResp{
+			var status = 1
+			var created = ChangeMonitorResp{
 				Stat: "ok",
-				Monitor: CreatedMonitor{
+				Monitor: ChangedMonitor{
 					Id:     99,
-					Status: 1,
+					Status: &status,
 				},
 			}
 			e.Encode(created)
+		} else if r.Method == "POST" && r.URL.Path == "/editMonitor" {
+			var edited = ChangeMonitorResp{
+				Stat: "ok",
+				Monitor: ChangedMonitor{
+					Id: 99,
+				},
+			}
+			e.Encode(edited)
 		}
 	}))
 }

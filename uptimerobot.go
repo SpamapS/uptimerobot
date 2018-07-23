@@ -74,14 +74,14 @@ type MonitorResp struct {
 	Monitors   []Monitor  `json:"monitors"`
 }
 
-type CreatedMonitor struct {
-	Id     int `json:"id"`
-	Status int `json:"status"`
+type ChangedMonitor struct {
+	Id     int  `json:"id"`
+	Status *int `json:"status,omitempty"`
 }
 
-type CreateMonitorResp struct {
+type ChangeMonitorResp struct {
 	Stat    string         `json:"stat"`
-	Monitor CreatedMonitor `json:"monitor"`
+	Monitor ChangedMonitor `json:"monitor"`
 }
 
 func (c *Client) _makeReq(path string, data *url.Values) (*http.Request, error) {
@@ -160,7 +160,7 @@ func (c *Client) CreateMonitor(m *Monitor) error {
 	}
 	defer resp.Body.Close()
 
-	var monitor_create_resp CreateMonitorResp
+	var monitor_create_resp ChangeMonitorResp
 	err = json.NewDecoder(resp.Body).Decode(&monitor_create_resp)
 	if err != nil {
 		return err
