@@ -84,7 +84,7 @@ type ChangeMonitorResp struct {
 	Monitor ChangedMonitor `json:"monitor"`
 }
 
-func (c *Client) _makeReq(path string, data *url.Values) (*http.Request, error) {
+func (c *Client) makeReq(path string, data *url.Values) (*http.Request, error) {
 	data.Set("api_key", c.Api_key)
 	data.Set("format", "json")
 	rel := &url.URL{Path: path}
@@ -101,7 +101,7 @@ func (c *Client) _makeReq(path string, data *url.Values) (*http.Request, error) 
 func (c *Client) GetMonitors() ([]Monitor, error) {
 	data := url.Values{}
 
-	req, err := c._makeReq("/getMonitors", &data)
+	req, err := c.makeReq("/getMonitors", &data)
 	if err != nil {
 		return nil, err
 	}
@@ -122,37 +122,39 @@ func (c *Client) GetMonitors() ([]Monitor, error) {
 	return monitors_resp.Monitors, err
 }
 
-func _optionalInt(data *url.Values, key string, value *int) {
+func optionalInt(data *url.Values, key string, value *int) {
 	if value != nil {
 		data.Set(key, fmt.Sprintf("%d", *value))
 	}
 }
 
-func _optionalString(data *url.Values, key string, value *string) {
+func optionalString(data *url.Values, key string, value *string) {
 	if value != nil {
 		data.Set(key, fmt.Sprintf("%s", *value))
 	}
 }
 
+func (c *Client) setCommonData(data *url.Values, m *Monitor) {
+	data.Set("friendly_name", m.Friendly_name)
+	data.Set("url", m.Url)
+	optionalInt(data, "sub_type", m.Sub_type)
+	optionalInt(data, "keyword_type", m.Keyword_type)
+	optionalString(data, "keyword_value", m.Keyword_value)
+	optionalString(data, "http_username", m.Http_username)
+	optionalString(data, "http_password", m.Http_password)
+	optionalString(data, "port", m.Port)
+	optionalInt(data, "interval", m.Interval)
+	optionalInt(data, "status", m.Status)
+}
+
 func (c *Client) CreateMonitor(m *Monitor) error {
 	data := url.Values{}
-	req, err := c._makeReq("/newMonitor", &data)
+	req, err := c.makeReq("/newMonitor", &data)
 	if err != nil {
 		return err
 	}
-	data.Set("friendly_name", m.Friendly_name)
-	data.Set("url", m.Url)
+	c.setCommonData(&data, m)
 	data.Set("type", fmt.Sprintf("%d", m.Monitor_type))
-	_optionalInt(&data, "sub_type", m.Sub_type)
-	_optionalInt(&data, "keyword_type", m.Keyword_type)
-	_optionalString(&data, "keyword_value", m.Keyword_value)
-	_optionalString(&data, "http_username", m.Http_username)
-	_optionalString(&data, "http_password", m.Http_password)
-	_optionalString(&data, "port", m.Port)
-	_optionalInt(&data, "interval", m.Interval)
-	_optionalInt(&data, "status", m.Status)
-	_optionalInt(&data, "create_datetime", m.Create_datetime)
-	_optionalInt(&data, "monitor_group", m.Monitor_group)
 
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
