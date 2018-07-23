@@ -55,10 +55,10 @@ func TestGetMonitors(t *testing.T) {
 	c := Client{
 		BaseURL:    u,
 		UserAgent:  "Bah",
-		httpClient: ts.Client(),
-		api_key:    "abcdefg",
+		HttpClient: ts.Client(),
+		Api_key:    "abcdefg",
 	}
-	m, err := c.getMonitors()
+	m, err := c.GetMonitors()
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 1, len(m))
 	assert.Equal(t, 99, (m[0].Id))
@@ -74,15 +74,15 @@ func TestCreateMonitor(t *testing.T) {
 	c := Client{
 		BaseURL:    u,
 		UserAgent:  "Bah",
-		httpClient: ts.Client(),
-		api_key:    "abcdefg",
+		HttpClient: ts.Client(),
+		Api_key:    "abcdefg",
 	}
 	m := Monitor{
 		Friendly_name: "make_friendly",
 		Url:           "http://make.test",
 		Monitor_type:  MONITOR_TYPE_HTTP,
 	}
-	err = c.createMonitor(&m)
+	err = c.CreateMonitor(&m)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 99, m.Id)
 }

@@ -11,8 +11,8 @@ import (
 type Client struct {
 	BaseURL    *url.URL
 	UserAgent  string
-	httpClient *http.Client
-	api_key    string
+	HttpClient *http.Client
+	Api_key    string
 }
 
 type Log struct {
@@ -85,7 +85,7 @@ type CreateMonitorResp struct {
 }
 
 func (c *Client) _makeReq(path string, data *url.Values) (*http.Request, error) {
-	data.Set("api_key", c.api_key)
+	data.Set("api_key", c.Api_key)
 	data.Set("format", "json")
 	rel := &url.URL{Path: path}
 	u := c.BaseURL.ResolveReference(rel)
@@ -98,7 +98,7 @@ func (c *Client) _makeReq(path string, data *url.Values) (*http.Request, error) 
 	return req, nil
 }
 
-func (c *Client) getMonitors() ([]Monitor, error) {
+func (c *Client) GetMonitors() ([]Monitor, error) {
 	data := url.Values{}
 
 	req, err := c._makeReq("/getMonitors", &data)
@@ -106,7 +106,7 @@ func (c *Client) getMonitors() ([]Monitor, error) {
 		return nil, err
 	}
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func _optionalString(data *url.Values, key string, value *string) {
 	}
 }
 
-func (c *Client) createMonitor(m *Monitor) error {
+func (c *Client) CreateMonitor(m *Monitor) error {
 	data := url.Values{}
 	req, err := c._makeReq("/newMonitor", &data)
 	if err != nil {
@@ -154,7 +154,7 @@ func (c *Client) createMonitor(m *Monitor) error {
 	_optionalInt(&data, "create_datetime", m.Create_datetime)
 	_optionalInt(&data, "monitor_group", m.Monitor_group)
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return err
 	}
