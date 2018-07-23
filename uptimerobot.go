@@ -2,6 +2,7 @@ package uptimerobot
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -160,6 +161,22 @@ func (c *Client) CreateMonitor(m *Monitor) error {
 		return err
 	}
 	m.Id = change_resp.Monitor.Id
+	return nil
+}
+
+func (c *Client) EditMonitor(m *Monitor) error {
+	if m.Id == 0 {
+		return errors.New("Id is required to edit")
+	}
+	data := url.Values{}
+	req, err := c.makeReq("/editMonitor", &data)
+	if err != nil {
+		return err
+	}
+	_, err = c.changeMonitor(req, &data, m)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

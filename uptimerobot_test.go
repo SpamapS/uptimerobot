@@ -115,3 +115,26 @@ func TestCreateMonitor(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 99, m.Id)
 }
+
+func TestEditMonitor(t *testing.T) {
+	ts := makeTestServer()
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	assert.Equal(t, nil, err)
+
+	c := Client{
+		BaseURL:    u,
+		UserAgent:  "Bah",
+		HttpClient: ts.Client(),
+		Api_key:    "abcdefg",
+	}
+	m := Monitor{
+		Id:            99,
+		Friendly_name: "make_friendly",
+		Url:           "http://make.test",
+		Monitor_type:  MONITOR_TYPE_HTTP,
+	}
+	err = c.EditMonitor(&m)
+	assert.Equal(t, nil, err)
+}
