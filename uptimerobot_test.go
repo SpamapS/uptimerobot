@@ -13,14 +13,34 @@ func _makeTestServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		e := json.NewEncoder(w)
 		if r.Method == "POST" && r.URL.Path == "/getMonitors" {
-			var mons = []Monitor{
-				Monitor{
+            mv := r.FormValue("monitors")
+            var mons []Monitor
+            mon_99 := Monitor{
 					Id:            99,
 					Friendly_name: "foo",
 					Url:           "http://nothing.test",
 					Monitor_type:  1,
-				},
 			}
+            mon_100 := Monitor{
+					Id:            100,
+					Friendly_name: "bar",
+					Url:           "http://nobar.test",
+					Monitor_type:  1,
+			}
+            if mv == "" || mv == "99-100" || mv == "100-99" {
+                mons = []Monitor{
+                    mon_99,
+                    mon_100,
+                }
+            } else if mv == "99" {
+                mons = []Monitor{
+                    mon_99,
+                }
+            } else if mv == "100" {
+                mons = []Monitor{
+                    mon_100,
+                }
+            }
 			p := Pagination{
 				Offset: 0,
 				Limit:  1,
@@ -60,7 +80,7 @@ func TestGetMonitors(t *testing.T) {
 	}
 	m, err := c.GetMonitors()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 1, len(m))
+	assert.Equal(t, 2, len(m))
 	assert.Equal(t, 99, (m[0].Id))
 }
 
