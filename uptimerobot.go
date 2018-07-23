@@ -153,20 +153,26 @@ func (c *Client) CreateMonitor(m *Monitor) error {
 	if err != nil {
 		return err
 	}
-	c.setCommonData(&data, m)
+	// Only allowed to set this on create
 	data.Set("type", fmt.Sprintf("%d", m.Monitor_type))
+	change_resp, err := c.changeMonitor(req, &data, m)
+	if err != nil {
+		return err
+	}
+	m.Id = change_resp.Monitor.Id
+	return nil
+}
+
+func (c *Client) changeMonitor(req *http.Request, data *url.Values, m *Monitor) (ChangeMonitorResp, error) {
+	var monitor_change_resp ChangeMonitorResp
+	c.setCommonData(data, m)
 
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
-		return err
+		return monitor_change_resp, err
 	}
 	defer resp.Body.Close()
 
-	var monitor_create_resp ChangeMonitorResp
-	err = json.NewDecoder(resp.Body).Decode(&monitor_create_resp)
-	if err != nil {
-		return err
-	}
-	m.Id = monitor_create_resp.Monitor.Id
-	return nil
+	err = json.NewDecoder(resp.Body).Decode(&monitor_change_resp)
+	return monitor_change_resp, err
 }
