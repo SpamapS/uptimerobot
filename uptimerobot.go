@@ -27,6 +27,17 @@ const MONITOR_TYPE_KEYWORD = 2
 const MONITOR_TYPE_PING = 3
 const MONITOR_TYPE_PORT = 4
 
+var MonitorTypeNames = map[string]int{
+	"HTTP":    MONITOR_TYPE_HTTP,
+	"HTTPS":   MONITOR_TYPE_HTTP,
+	"HTTP(s)": MONITOR_TYPE_HTTP,
+	"http":    MONITOR_TYPE_HTTP,
+	"https":   MONITOR_TYPE_HTTP,
+	"keyword": MONITOR_TYPE_KEYWORD,
+	"ping":    MONITOR_TYPE_PING,
+	"port":    MONITOR_TYPE_PORT,
+}
+
 const MONITOR_SUB_TYPE_HTTP = 1
 const MONITOR_SUB_TYPE_HTTPS = 2
 const MONITOR_SUB_TYPE_FTP = 3
