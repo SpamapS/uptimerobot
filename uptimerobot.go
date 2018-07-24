@@ -90,12 +90,14 @@ func (c *Client) makeReq(path string, data *url.Values) (*http.Request, error) {
 	data.Set("format", "json")
 	rel := &url.URL{Path: path}
 	u := c.BaseURL.ResolveReference(rel)
-	req, err := http.NewRequest("POST", u.String(), strings.NewReader(data.Encode()))
+	body := data.Encode()
+	req, err := http.NewRequest("POST", u.String(), strings.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", c.UserAgent)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	return req, nil
 }
 
