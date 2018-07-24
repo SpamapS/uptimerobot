@@ -99,8 +99,16 @@ func (c *Client) makeReq(path string, data *url.Values) (*http.Request, error) {
 	return req, nil
 }
 
-func (c *Client) GetMonitors() ([]Monitor, error) {
+func (c *Client) GetMonitors(ids []int) ([]Monitor, error) {
 	data := url.Values{}
+	if len(ids) > 0 {
+		var str_ids []string
+		for i := 0; i < len(ids); i++ {
+			id := ids[i]
+			str_ids = append(str_ids, fmt.Sprintf("%d", id))
+		}
+		data.Set("monitors", strings.Join(str_ids, "-"))
+	}
 
 	req, err := c.makeReq("/getMonitors", &data)
 	if err != nil {
@@ -113,8 +121,6 @@ func (c *Client) GetMonitors() ([]Monitor, error) {
 	}
 	defer resp.Body.Close()
 
-	//bodybuffer, _ := ioutil.ReadAll(resp.Body)
-	//fmt.Printf("%s", bodybuffer)
 	var monitors_resp MonitorResp
 	err = json.NewDecoder(resp.Body).Decode(&monitors_resp)
 	if err != nil {

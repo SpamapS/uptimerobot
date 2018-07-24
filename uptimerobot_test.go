@@ -97,7 +97,8 @@ func TestGetMonitors(t *testing.T) {
 		HttpClient: ts.Client(),
 		Api_key:    "abcdefg",
 	}
-	m, err := c.GetMonitors()
+	var ids []int
+	m, err := c.GetMonitors(ids)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 2, len(m))
 	assert.Equal(t, 99, (m[0].Id))
