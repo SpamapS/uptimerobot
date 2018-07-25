@@ -144,8 +144,11 @@ func (c *Client) GetMonitors(ids []int) ([]Monitor, error) {
 	}
 	defer resp.Body.Close()
 
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+	log.Print("[TRACE] ", buf.String())
 	var monitors_resp MonitorResp
-	err = json.NewDecoder(resp.Body).Decode(&monitors_resp)
+	err = json.NewDecoder(buf).Decode(&monitors_resp)
 	if err != nil {
 		return nil, err
 	}
