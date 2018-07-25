@@ -1,9 +1,11 @@
 package uptimerobot
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -101,6 +103,7 @@ func (c *Client) makeReq(path string, data *url.Values) (*http.Request, error) {
 	data.Set("format", "json")
 	rel := &url.URL{Path: path}
 	u := c.BaseURL.ResolveReference(rel)
+	log.Print("[TRACE] Sending req to ", u)
 	body := data.Encode()
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(body))
 	if err != nil {
@@ -123,7 +126,7 @@ func (c *Client) GetMonitors(ids []int) ([]Monitor, error) {
 		data.Set("monitors", strings.Join(str_ids, "-"))
 	}
 
-	req, err := c.makeReq("/getMonitors", &data)
+	req, err := c.makeReq("getMonitors", &data)
 	if err != nil {
 		return nil, err
 	}
@@ -169,14 +172,17 @@ func (c *Client) setCommonData(data *url.Values, m *Monitor) {
 
 func (c *Client) CreateMonitor(m *Monitor) error {
 	data := url.Values{}
-	req, err := c.makeReq("/newMonitor", &data)
+	req, err := c.makeReq("newMonitor", &data)
 	if err != nil {
+		log.Print("[DEBUG] error during makeReq = ", err)
 		return err
 	}
 	// Only allowed to set this on create
 	data.Set("type", fmt.Sprintf("%d", m.Monitor_type))
 	change_resp, err := c.changeMonitor(req, &data, m)
+	log.Print("[TRACE] resp = ", change_resp)
 	if err != nil {
+		log.Print("[DEBUG] error during changeMonitor = ", err)
 		return err
 	}
 	m.Id = change_resp.Monitor.Id
@@ -188,7 +194,7 @@ func (c *Client) EditMonitor(m *Monitor) error {
 		return errors.New("Id is required to edit")
 	}
 	data := url.Values{}
-	req, err := c.makeReq("/editMonitor", &data)
+	req, err := c.makeReq("editMonitor", &data)
 	if err != nil {
 		return err
 	}
@@ -198,7 +204,7 @@ func (c *Client) EditMonitor(m *Monitor) error {
 
 func (c *Client) DeleteMonitor(id int) error {
 	data := url.Values{}
-	req, err := c.makeReq("/deleteMonitor", &data)
+	req, err := c.makeReq("deleteMonitor", &data)
 	if err != nil {
 		return err
 	}
@@ -215,10 +221,25 @@ func (c *Client) changeMonitor(req *http.Request, data *url.Values, m *Monitor) 
 
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
+		log.Print("[DEBUG] error during Httpclient.Do: ", err)
 		return monitor_change_resp, err
 	}
+
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		log.Print("[ERROR] got non-200 from server: ", resp.Status)
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(resp.Body)
+		return monitor_change_resp, errors.New(buf.String())
+	}
 
 	err = json.NewDecoder(resp.Body).Decode(&monitor_change_resp)
+	if err != nil {
+		return monitor_change_resp, err
+	}
+	if monitor_change_resp.Stat != "ok" {
+		log.Print("[DEBUG] Stat = ", monitor_change_resp.Stat)
+		return monitor_change_resp, errors.New("Server reports request not ok!")
+	}
 	return monitor_change_resp, err
 }
