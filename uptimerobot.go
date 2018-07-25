@@ -29,6 +29,13 @@ const MONITOR_TYPE_KEYWORD = 2
 const MONITOR_TYPE_PING = 3
 const MONITOR_TYPE_PORT = 4
 
+var MonitorTypeToName = map[int]string{
+	MONITOR_TYPE_HTTP:    "HTTP(s)",
+	MONITOR_TYPE_KEYWORD: "keyword",
+	MONITOR_TYPE_PING:    "ping",
+	MONITOR_TYPE_PORT:    "port",
+}
+
 var MonitorTypeNames = map[string]int{
 	"HTTP":    MONITOR_TYPE_HTTP,
 	"HTTPS":   MONITOR_TYPE_HTTP,
