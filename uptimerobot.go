@@ -69,7 +69,7 @@ type Monitor struct {
 	Friendly_name   string  `json:"friendly_name"`
 	Url             string  `json:"url"`
 	Monitor_type    int     `json:"type"`
-	Sub_type        *int    `json:"sub_type,omitempty"`
+	Sub_type        *string `json:"sub_type,omitempty"`
 	Keyword_type    *int    `json:"keyword_type,omitempty"`
 	Keyword_value   *string `json:"keyword_value,omitempty"`
 	Http_username   *string `json:"http_username,omitempty"`
@@ -170,7 +170,7 @@ func optionalString(data *url.Values, key string, value *string) {
 func (c *Client) setCommonData(data *url.Values, m *Monitor) {
 	data.Set("friendly_name", m.Friendly_name)
 	data.Set("url", m.Url)
-	optionalInt(data, "sub_type", m.Sub_type)
+	optionalString(data, "sub_type", m.Sub_type)
 	optionalInt(data, "keyword_type", m.Keyword_type)
 	optionalString(data, "keyword_value", m.Keyword_value)
 	optionalString(data, "http_username", m.Http_username)
